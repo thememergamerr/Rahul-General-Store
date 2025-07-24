@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Rahul General Store | Inspired by JioMart</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --text: #333333;
+      --primary: #0066cc;
+      --secondary: #f1f1f1;
+    }
+
+    body.dark {
+      --bg: #121212;
+      --text: #ffffff;
+      --primary: #1e88e5;
+      --secondary: #1f1f1f;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      transition: all 0.3s ease;
+    }
+
+    header {
+      background: var(--primary);
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+
+    .search-cart {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .search-cart input, .search-cart select {
+      padding: 8px;
+      font-size: 14px;
+    }
+
+    .cart-btn {
+      background: yellow;
+      color: black;
+      font-weight: bold;
+      border: none;
+      padding: 8px 12px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    nav {
+      background: var(--secondary);
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    nav .menu {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    nav .menu a {
+      text-decoration: none;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    nav button {
+      padding: 6px 10px;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+      background: var(--primary);
+      color: white;
+    }
+
+    .container {
+      padding: 20px;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    .products {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 20px;
+    }
+
+    .product {
+      background: var(--secondary);
+      padding: 10px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .product img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 5px;
+    }
+
+    .product h3 {
+      font-size: 16px;
+      margin: 10px 0 5px;
+    }
+
+    .product p {
+      font-size: 14px;
+      margin: 5px 0;
+    }
+
+    .product button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 8px 10px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      background: var(--secondary);
+      margin-top: 40px;
+    }
+
+    .cart-popup {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .cart-box {
+      background: var(--bg);
+      padding: 20px;
+      max-width: 500px;
+      width: 90%;
+      border-radius: 10px;
+    }
+
+    .cart-box h2 {
+      margin-top: 0;
+    }
+
+    .cart-items {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 8px;
+    }
+
+    .modal, .cart-popup {
+      z-index: 1000;
+    }
+
+    .close-btn {
+      background: crimson;
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    /* Login/Register Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: var(--bg);
+      padding: 20px;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 400px;
+    }
+
+    .modal-content h2 {
+      margin-top: 0;
+    }
+
+    .modal-content input {
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 8px;
+    }
+
+    .modal-content button {
+      width: 100%;
+      padding: 10px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    @media (max-width: 600px) {
+      header, nav {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .search-cart {
+        flex-direction: column;
+        width: 100%;
+      }
+
+      .search-cart input {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Rahul General Store</h1>
+    <div class="search-cart">
+      <input type="text" id="searchInput" placeholder="Search products..." />
+      <select id="categorySelect">
+        <option value="">All Categories</option>
+        <option value="Groceries">Groceries</option>
+        <option value="Personal Care">Personal Care</option>
+        <option value="Household">Household</option>
+      </select>
+      <button class="cart-btn" onclick="toggleCart()">🛒 Cart (<span id="cart-count">0</span>)</button>
+    </div>
+  </header>
+
+  <nav>
+    <div class="menu">
+      <a href="#">Home</a>
+      <a href="#">Products</a>
+      <a href="#">Contact</a>
+    </div>
+    <div>
+      <button onclick="toggleDarkMode()">🌓</button>
+      <button onclick="openModal()">Login</button>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="products" id="productList">
+      <!-- Products injected by JS -->
+    </div>
+  </div>
+
+  <footer>
+    &copy; 2025 Rahul General Store. All rights reserved.
+  </footer>
+
+  <!-- Cart Popup -->
+  <div class="cart-popup" id="cartPopup">
+    <div class="cart-box">
+      <h2>Your Cart</h2>
+      <div class="cart-items" id="cartItems"></div>
+      <p><strong>Total:</strong> ₹<span id="cartTotal">0</span></p>
+      <button class="close-btn" onclick="toggleCart()">Close</button>
+    </div>
+  </div>
+
+  <!-- Login/Register Modal -->
+  <div class="modal" id="authModal">
+    <div class="modal-content">
+      <h2>Login / Register</h2>
+      <input type="text" placeholder="Email or Phone">
+      <input type="password" placeholder="Password">
+      <button onclick="alert('Logged in (demo)!')">Submit</button>
+      <button class="close-btn" onclick="closeModal()">Close</button>
+    </div>
+  </div>
+
+  <script>
+
+  const products = [
+  // --- Groceries ---
+  {
+    name: "Wheat Flour (5kg)",
+    price: 250,
+    image: "https://m.media-amazon.com/images/I/9104JpXbv6L.jpg",
+    category: "Groceries"
+  },
+  {
+    name: "Rice (5kg)",
+    price: 320,
+    image: "https://m.media-amazon.com/images/I/813rEkxOpFL._UF894,1000_QL80_.jpg",
+    category: "Groceries"
+  },
+  {
+    name: "Sugar (1kg)",
+    price: 45,
+    image: "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcSLlt2aolemnNhJmV548886TWfmxX_taWd5L_Cp15xOjaydTrY7bp4pAJSq0khX3SI8UxfXN5PQ9fwNex54qRFNKKxy19WXXz5GchPw0e4",
+    category: "Groceries"
+  },
+  {
+    name: "Salt (1kg)",
+    price: 20,
+    image: "https://www.tatanutrikorner.com/cdn/shop/files/Tata_Salt_-_North_Central_Recyclable_AH-IN-JB-RP-BH-PU-SG_1_Kg_FOP-removebg-preview.png?v=1745827173&width=1920",
+    category: "Groceries"
+  },
+  {
+    name: "Cooking Oil (1L)",
+    price: 140,
+    image: "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQS7FW6_0Tf-dOUeIJDC98rLYvgcclnz_zHk3DKxBBnzW-UVKshUlFXiYVzNla2F0rTcmjnmL69EIX22LJDjCwiiPFFhTsygR13dKyvafCWszWvmJJAnZdKsg",
+    category: "Groceries"
+  },
+  {
+    name: "Turmeric Powder (100g)",
+    price: 30,
+    image: "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRa_XALMOjGayihTrpkHLzWjMHYSnCxenWISnJdqjCI81FAZu5UA_3XYYoL5kj_Nmk0rtaYUGOW56sWWsde0lPGZc7qh5a1WZTh3MJyOLg",
+    category: "Groceries"
+  },
+
+  // --- Personal Care ---
+  {
+    name: "Toothpaste",
+    price: 50,
+    image: "https://m.media-amazon.com/images/I/517N2iSlyGS.jpg",
+    category: "Personal Care"
+  },
+  {
+    name: "Shampoo",
+    price: 120,
+    image: "https://m.media-amazon.com/images/I/51kvIpFhG5L.jpg",
+    category: "Personal Care"
+  },
+  {
+    name: "Hand Wash",
+    price: 90,
+    image: "https://rukminim2.flixcart.com/image/704/844/xif0q/hand-wash-sanitizer/j/d/i/-original-imahag32uygzrd6g.jpeg?q=90&crop=false",
+    category: "Personal Care"
+  },
+  {
+    name: "Bath Soap",
+    price: 30,
+    image: "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTOFnro4CL6YEY0z43SK5HWR7EipwCNehbaQuaJcxPIeixqoif_36ErpDmW5gwO65g8lV9dOKHwX84LZt5QavH_GgNuoZlq_sqY2RQNy5FPMeLFas799Ct0OSYXZPHaWrgIEPmx1Et25lk&usqp=CAc",
+    category: "Personal Care"
+  },
+  {
+    name: "Face Wash",
+    price: 110,
+    image: "https://rukminim2.flixcart.com/image/612/612/xif0q/face-wash/r/m/7/-original-imahc5dxmrgvyxzc.jpeg?q=70",
+    category: "Personal Care"
+  },
+  {
+    name: "Body Lotion",
+    price: 180,
+    image: "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTzebz1CapXD2ClkFSjTUp6BccLCJhLXQ7x-03AW-QZcfsw3Mg8IwkNfRY3XTCMQ2V1Ea-lRCNBaYkiqdsKdbOAygu_VJ9vgqRhO8u1welIrimJhqpk-CG_qg61SWm4EjDtbMT4n02bbw&usqp=CAc",
+    category: "Personal Care"
+  },
+
+  // --- Household ---
+  {
+    name: "Detergent",
+    price: 140,
+    image: "https://www.jiomart.com/images/product/original/491278427/surf-excel-easy-wash-detergent-powder-1-kg-product-images-o491278427-p491278427-0-202502030811.jpg?im=Resize=(360,360)",
+    category: "Household"
+  },
+  {
+    name: "Dish Wash Liquid",
+    price: 85,
+    image: "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRTkzgZApg4QbuBWprMAlZOgluE6GtZs5xJUs2qvwtnJNQdKB_5EL83hWuePk_Z0QxB967X3Faa07Q7I_uTGJFh5b2oBMLRosyccPsvk8WCAWzjU5V-nzK7gftlBW99a0WSyvF8M6EN&usqp=CAc",
+    category: "Household"
+  },
+  {
+    name: "Floor Cleaner",
+    price: 150,
+    image: "data:image/webp;base64,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",
+    category: "Household"
+  },
+  {
+    name: "Garbage Bags (Medium, 30pc)",
+    price: 60,
+    image: "https://m.media-amazon.com/images/I/41Eow46XY6L.jpg",
+    category: "Household"
+  },
+  {
+    name: "Tissue Roll (2pc)",
+    price: 40,
+    image: "https://m.media-amazon.com/images/I/41OCqcf-GCL._AC_UF1000,1000_QL80_.jpg",
+    category: "Household"
+  },
+  {
+    name: "Room Freshener",
+    price: 130,
+    image: "https://m.media-amazon.com/images/I/41Z+F5q0ARL.jpg",
+    category: "Household"
+  },
+
+  // --- Snacks ---
+  {
+    name: "Lay's Potato Chips (Classic)",
+    price: 30,
+    image: "https://m.media-amazon.com/images/I/61e+UwnsWwL.jpg",
+    category: "Snacks"
+  },
+  {
+    name: "Kurkure Masala Munch",
+    price: 20,
+    image: "https://m.media-amazon.com/images/I/817rZ3BUkdL.jpg",
+    category: "Snacks"
+  },
+  {
+    name: "Parle-G Biscuits (800g)",
+    price: 40,
+    image: "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQ3NfY9sx7u67c-fsGCdWJ1cCqdfpuAAUqY6_5Y5QXi36jEqZpTJY6Gu4ssdTpV6bYV4L0i1g1WzhK-XXtBK5_jx19nSJVYPIAeL8exkcDfjTJlb6DzZtQUhh4",
+    category: "Snacks"
+  },
+
+  // --- Beverages ---
+  {
+    name: "Coca-Cola (1.25L)",
+    price: 55,
+    image: "https://m.media-amazon.com/images/I/61y4HOllrdL._SL1500_.jpg",
+    category: "Beverages"
+  },
+  {
+    name: "Tata Tea Gold (250g)",
+    price: 120,
+    image: "https://m.media-amazon.com/images/I/51Oyr9hIsOL._SL1000_.jpg",
+    category: "Beverages"
+  },
+  {
+    name: "Nescafé Classic Coffee (100g)",
+    price: 300,
+    image: "https://m.media-amazon.com/images/I/71OexQTz4-L._SL1500_.jpg",
+    category: "Beverages"
+  }
+];
+
+
+
+    let cart = [];
+
+    const productList = document.getElementById("productList");
+    const searchInput = document.getElementById("searchInput");
+    const categorySelect = document.getElementById("categorySelect");
+    const cartCount = document.getElementById("cart-count");
+    const cartItems = document.getElementById("cartItems");
+    const cartTotal = document.getElementById("cartTotal");
+
+    function renderProducts() {
+      productList.innerHTML = "";
+      const search = searchInput.value.toLowerCase();
+      const category = categorySelect.value;
+      const filtered = products.filter(p =>
+        p.name.toLowerCase().includes(search) &&
+        (category ? p.category === category : true)
+      );
+
+      filtered.forEach(p => {
+        const div = document.createElement("div");
+        div.className = "product";
+        div.innerHTML = `
+          <img src="${p.image}" alt="${p.name}">
+          <h3>${p.name}</h3>
+          <p>₹${p.price}</p>
+          <button onclick='addToCart(${JSON.stringify(p)})'>Add to Cart</button>
+        `;
+        productList.appendChild(div);
+      });
+    }
+
+    function addToCart(product) {
+      const index = cart.findIndex(item => item.name === product.name);
+      if (index > -1) {
+        cart[index].qty++;
+      } else {
+        cart.push({ ...product, qty: 1 });
+      }
+      updateCart();
+    }
+
+    function updateCart() {
+      cartCount.textContent = cart.reduce((sum, item) => sum + item.qty, 0);
+      cartItems.innerHTML = "";
+      let total = 0;
+      cart.forEach(item => {
+        total += item.qty * item.price;
+        cartItems.innerHTML += `
+          <div class="cart-item">
+            <span>${item.name} (x${item.qty})</span>
+            <button onclick='removeFromCart("${item.name}")'>❌</button>
+          </div>
+        `;
+      });
+      cartTotal.textContent = total;
+    }
+
+    function removeFromCart(name) {
+      cart = cart.filter(item => item.name !== name);
+      updateCart();
+    }
+
+    function toggleCart() {
+      document.getElementById("cartPopup").style.display =
+        document.getElementById("cartPopup").style.display === "flex" ? "none" : "flex";
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark");
+    }
+
+    function openModal() {
+      document.getElementById("authModal").style.display = "flex";
+    }
+
+    function closeModal() {
+      document.getElementById("authModal").style.display = "none";
+    }
+
+    searchInput.addEventListener("input", renderProducts);
+    categorySelect.addEventListener("change", renderProducts);
+    renderProducts();
+  </script>
+</body>
+</html>
